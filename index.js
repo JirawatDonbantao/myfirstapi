@@ -17,6 +17,12 @@ app.get('/time', (req, res) => {
   })
 })
 
+// โค้ดพัง ทดสอบการย้อนกลับ
+app.get('/broken', (req, res) => {
+  throw new Error('โค้ดพังแล้ว!')
+})
+
+
 app.get('/hello/:name', (req, res) => {
   const name = req.params.name
   res.json({
