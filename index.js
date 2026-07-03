@@ -48,7 +48,7 @@ app.get('/secret', (req, res) => {
 
 // ✅ Route จำลอง Error — เพื่อทดสอบ Error Log
 app.get('/error-test', (req, res) => {
-  console.log('กำลังจะเกิด Error...')
+  console.log('กำลังจะเกิด Error....')
   throw new Error('นี่คือ Error จำลองสำหรับทดสอบ!')
 })
 
