@@ -2,12 +2,14 @@ require('dotenv').config()
 
 const express = require('express')
 const axios = require('axios')        // ← รวมไว้บนสุด
+const cors = require('cors') 
 const app = express()
 
 const PORT = process.env.PORT || 3000
 const APP_NAME = process.env.APP_NAME || 'API'
 const SECRET_MESSAGE = process.env.SECRET_MESSAGE || 'ไม่มีข้อความ'
 
+app.use(cors()) 
 // ✅ Middleware ต้องอยู่ก่อน Route ทุกตัว
 app.use((req, res, next) => {
   const time = new Date().toISOString()
