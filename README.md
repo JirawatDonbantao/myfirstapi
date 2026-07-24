@@ -1,10 +1,10 @@
 # 🚀 MyFirstAPI
 
-โปรเจกต์ API แรกของฉัน สร้างด้วย Node.js และ Express พร้อม Deploy ขึ้น Cloud จริงบน Railway ปัจจุบันมีระบบ **สมัครสมาชิก/เข้าสู่ระบบ** ด้วย JWT และเชื่อมต่อฐานข้อมูล PostgreSQL แบบ Production จริง
+โปรเจกต์ API แรกของฉัน สร้างด้วย Node.js และ Express พร้อม Deploy ขึ้น Cloud จริงบน **Render** เชื่อมต่อฐานข้อมูล **Neon PostgreSQL** มีระบบ **สมัครสมาชิก/เข้าสู่ระบบ** ด้วย JWT
 
 เป็นส่วนหนึ่งของการเรียนรู้ **DevOps และ Cloud Engineering** ตั้งแต่พื้นฐาน — จากศูนย์จนถึง Deploy ระบบขึ้น Production จริง
 
-🔗 **Live API:** [myfirstapi-production-40f1.up.railway.app](https://myfirstapi-production-40f1.up.railway.app)
+🔗 **Live API:** [myfirstapi-rjv4.onrender.com](https://myfirstapi-rjv4.onrender.com)
 
 ---
 
@@ -16,10 +16,12 @@
 - การจัดการ Environment Variables อย่างปลอดภัย
 - ระบบ Logging และ Error Handling
 - การเชื่อมต่อกับ API ภายนอก (WeatherAPI)
-- การเชื่อมต่อฐานข้อมูล PostgreSQL (Railway) พร้อมบันทึกประวัติการค้นหา
-- **ระบบ Authentication ด้วย JWT** — สมัครสมาชิก, เข้าสู่ระบบ, และป้องกัน Route สำคัญ
-- การเข้ารหัส Password ด้วย bcrypt (ไม่เก็บ Password แบบข้อความล้วน)
-- การ Deploy และ Redeploy บน Cloud Platform (Railway)
+- การเชื่อมต่อฐานข้อมูล PostgreSQL (Neon) พร้อมบันทึกประวัติการค้นหา
+- ระบบ Authentication ด้วย JWT — สมัครสมาชิก, เข้าสู่ระบบ, และป้องกัน Route สำคัญ
+- การเข้ารหัส Password ด้วย bcrypt
+- **Automated Testing** ด้วย Jest + Supertest
+- **CI (Continuous Integration)** ด้วย GitHub Actions — รัน Test อัตโนมัติทุกครั้งที่ push
+- การ Deploy และ Redeploy บน Cloud Platform (Render)
 
 ---
 
@@ -35,7 +37,10 @@
 | **pg (node-postgres)** | เชื่อมต่อและจัดการฐานข้อมูล PostgreSQL |
 | **bcrypt** | เข้ารหัส (Hash) Password ก่อนบันทึกลงฐานข้อมูล |
 | **jsonwebtoken** | สร้างและตรวจสอบ JWT Token สำหรับ Authentication |
-| **Railway** | Cloud Platform สำหรับ Deploy (PaaS) — ทั้ง API และ PostgreSQL |
+| **Jest + Supertest** | เขียนและรัน Automated Test |
+| **GitHub Actions** | รัน Test อัตโนมัติทุกครั้งที่ push (CI) |
+| **Render** | Cloud Platform สำหรับ Deploy Backend (PaaS) |
+| **Neon** | PostgreSQL แบบ Serverless สำหรับฐานข้อมูล |
 | **Git & GitHub** | Version Control |
 
 ---
@@ -44,87 +49,19 @@
 
 | Method | Endpoint | Auth | คำอธิบาย |
 |---|---|---|---|
-| `GET` | `/` | - | ตรวจสอบว่า API ทำงานปกติ |
+| `GET` | `/` | - | ตรวจสอบว่า API ทำงานปกติ (Health Check) |
 | `GET` | `/time` | - | คืนค่าเวลาปัจจุบันของ Server |
 | `GET` | `/hello/:name` | - | ทักทายตามชื่อที่ส่งมา |
 | `GET` | `/secret` | 🔒 ต้อง Login | ทดสอบ Route ที่ป้องกันด้วย Authentication |
-| `GET` | `/error-test` | - | จำลอง Error เพื่อทดสอบ Error Handler |
 | `POST` | `/register` | - | สมัครสมาชิกใหม่ (Password จะถูก Hash ก่อนบันทึก) |
 | `POST` | `/login` | - | เข้าสู่ระบบ รับ JWT Token กลับมาใช้งาน |
 | `GET` | `/weather/:city` | 🔓 Login ได้ (ไม่บังคับ) | ดึงข้อมูลสภาพอากาศ หากแนบ Token จะบันทึกประวัติผูกกับผู้ใช้ |
 | `POST` | `/history` | - | บันทึกประวัติการค้นหาแบบ Manual |
 | `GET` | `/history` | - | ดึงประวัติการค้นหาล่าสุด 5 รายการ |
 
-### ตัวอย่างการเรียกใช้ — สมัครสมาชิก
-
-```bash
-POST /register
-Content-Type: application/json
-
-{
-  "username": "wat",
-  "password": "mypassword123"
-}
-```
-
-**Response:**
-```json
-{
-  "status": "ok",
-  "user": { "id": 1, "username": "wat" }
-}
-```
-
-### ตัวอย่างการเรียกใช้ — เข้าสู่ระบบ
-
-```bash
-POST /login
-Content-Type: application/json
-
-{
-  "username": "wat",
-  "password": "mypassword123"
-}
-```
-
-**Response:**
-```json
-{
-  "status": "ok",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-
-### ตัวอย่างการเรียกใช้ — Route ที่ต้อง Login
-
-```bash
-GET /secret
-Authorization: Bearer <token>
-```
-
-### ตัวอย่างการเรียกใช้ — เช็คอากาศ
-
-```bash
-GET /weather/Bangkok
-```
-
-**Response:**
-```json
-{
-  "city": "Bangkok",
-  "country": "Thailand",
-  "temp_c": 30.4,
-  "feels_like": 38.1,
-  "humidity": 79,
-  "wind_kph": 16.2,
-  "condition": "Light rain shower",
-  "icon": "//cdn.weatherapi.com/weather/64x64/night/353.png"
-}
-```
-
 ---
 
-## 🗄️ Database Schema
+## 🗄️ Database Schema (Neon PostgreSQL)
 
 **ตาราง `users`**
 
@@ -151,15 +88,21 @@ GET /weather/Bangkok
 ```
 Client (Browser)
       │
-      ├── Register / Login ──▶ Railway (Express API) ──▶ PostgreSQL (users table)
+      ├── Register / Login ──▶ Render (Express API) ──▶ Neon PostgreSQL (users)
       │                                │
       │                          JWT Token ออกกลับมา
       │                                │
       ▼                                ▼
-Weather Request (+ Token)  ──▶ Railway (Express API) ──▶ WeatherAPI.com
+Weather Request (+ Token)  ──▶ Render (Express API) ──▶ WeatherAPI.com
                                        │
                                        ▼
-                          PostgreSQL (search_history + user_id)
+                          Neon PostgreSQL (search_history + user_id)
+```
+
+**CI Pipeline:**
+```
+Push โค้ด ──▶ GitHub Actions รัน Jest ──▶ ✅/❌ แจ้งผลบน GitHub
+        └──▶ Render ตรวจจับโค้ดใหม่ ──▶ Build + Deploy อัตโนมัติ
 ```
 
 ---
@@ -169,17 +112,14 @@ Weather Request (+ Token)  ──▶ Railway (Express API) ──▶ WeatherAPI.
 ### สิ่งที่ต้องมีก่อน
 - Node.js (v18 หรือสูงกว่า)
 - npm
-- PostgreSQL Database (เช่นผ่าน Railway)
+- PostgreSQL Database (แนะนำ [Neon](https://neon.tech) — ฟรี ไม่มีวันหมดอายุ)
 - WeatherAPI Key (สมัครฟรีที่ [weatherapi.com](https://www.weatherapi.com))
 
 ### ขั้นตอนติดตั้ง
 
 ```bash
-# Clone โปรเจกต์
 git clone https://github.com/JirawatDonbantao/myfirstapi.git
 cd myfirstapi
-
-# ติดตั้ง dependencies
 npm install
 
 # สร้างไฟล์ .env แล้วใส่ค่าตามนี้
@@ -187,52 +127,47 @@ PORT=3000
 APP_NAME=MyFirstAPI
 SECRET_MESSAGE=your_secret_message
 WEATHER_API_KEY=your_weatherapi_key
-DATABASE_PUBLIC_URL=your_postgres_connection_string
+DATABASE_URL=your_neon_connection_string
 JWT_SECRET=your_random_secret_key
 FRONTEND_URL=http://localhost:5500
 
-# สร้างตารางในฐานข้อมูล (รันผ่าน psql หรือ Railway Console)
-# ดูโครงสร้างตารางที่หัวข้อ Database Schema ด้านบน
-
-# รันโปรเจกต์
 npm start
 ```
 
-เปิดเบราว์เซอร์ไปที่ `http://localhost:3000`
+### รัน Test
+
+```bash
+npx jest
+```
 
 ---
 
 ## 🔐 Environment Variables
 
-โปรเจกต์นี้ใช้ไฟล์ `.env` เก็บข้อมูลสำคัญ (ไม่ถูก commit ขึ้น GitHub เพื่อความปลอดภัย)
-
 | Variable | คำอธิบาย |
 |---|---|
-| `PORT` | Port ที่ Server จะรัน (Railway กำหนดให้อัตโนมัติเมื่อ Deploy) |
+| `PORT` | Port ที่ Server จะรัน (Render กำหนดให้อัตโนมัติเมื่อ Deploy) |
 | `APP_NAME` | ชื่อแอปพลิเคชัน |
 | `SECRET_MESSAGE` | ข้อความทดสอบสำหรับ route `/secret` |
 | `WEATHER_API_KEY` | API Key จาก WeatherAPI.com |
-| `DATABASE_PUBLIC_URL` | Connection String เชื่อมต่อ PostgreSQL |
-| `JWT_SECRET` | กุญแจลับสำหรับเซ็นและตรวจสอบ JWT Token (ต้องสุ่มให้ยาวและคาดเดายาก) |
-| `FRONTEND_URL` | URL ของ Frontend ที่อนุญาตให้เรียก API ผ่าน CORS |
+| `DATABASE_URL` | Connection String เชื่อมต่อ Neon PostgreSQL |
+| `JWT_SECRET` | กุญแจลับสำหรับเซ็นและตรวจสอบ JWT Token |
+| `FRONTEND_URL` | URL ของ Frontend ที่อนุญาตให้เรียก API ผ่าน CORS (ห้ามมี `/` ต่อท้าย) |
 
 ---
 
 ## 📚 สิ่งที่ได้เรียนรู้จากโปรเจกต์นี้
 
-- ความแตกต่างระหว่าง IaaS, PaaS และ SaaS ผ่านการใช้งาน Railway จริง
-- Git workflow พื้นฐาน: `init`, `add`, `commit`, `push`, `revert`
+- ความแตกต่างระหว่าง IaaS, PaaS และ SaaS ผ่านการใช้งาน Cloud Platform จริง
+- Git workflow: `init`, `add`, `commit`, `push`, `revert`
 - การป้องกันข้อมูลสำคัญด้วย Environment Variables และ `.gitignore`
-- การเขียน Middleware สำหรับ Logging และ Error Handling ใน Express
-- การเชื่อมต่อกับ External API ด้วย axios
-- การแก้ปัญหา CORS เมื่อมี Frontend เรียกใช้ API จากคนละ Domain
-- การออกแบบและเชื่อมโยงตารางฐานข้อมูล PostgreSQL ด้วย Foreign Key
-- **หลักการ Authentication vs Authorization และ IAM**
-- **การ Hash Password ด้วย bcrypt แทนการเก็บ Plain Text**
-- **การสร้างและตรวจสอบ JWT Token สำหรับระบบ Login**
-- **การเขียน Middleware แบบบังคับ (Authentication) และไม่บังคับ (Optional Authentication)**
-- **หลัก Data Protection — ไม่เปิดเผยรายละเอียด Error ที่ไม่จำเป็นให้ผู้ใช้เห็น**
-- การทดสอบ API ด้วย Postman (Register, Login, Protected Routes)
+- การเขียน Middleware สำหรับ Logging, Error Handling และ Authentication
+- หลักการ Authentication vs Authorization, IAM, Least Privilege
+- การ Hash Password ด้วย bcrypt และสร้าง JWT Token
+- **การเขียน Automated Test ด้วย Jest + Supertest**
+- **การตั้งค่า CI ด้วย GitHub Actions ให้รัน Test อัตโนมัติทุก push**
+- **การย้าย Backend + Database ข้าม Cloud Platform (Railway → Render + Neon) โดยไม่แก้โค้ด core ใดๆ เลย** — พิสูจน์ว่าการออกแบบผ่าน Environment Variables มาตรฐานช่วยให้ย้ายแพลตฟอร์มได้ง่าย
+- การ Debug ปัญหาจริง เช่น CORS mismatch, Environment Variable ตั้งผิด service, filename ผิด
 
 ---
 
@@ -240,7 +175,7 @@ npm start
 
 คอร์สเรียน **Cloud Computing & DevOps** — เส้นทางสู่การเป็น Cloud/DevOps Engineer
 
-ดูโปรเจกต์ถัดไป: [weather-app](https://github.com/JirawatDonbantao/weather-app) — Full-Stack Weather Application ที่เชื่อมต่อกับ API นี้ พร้อมระบบ Login
+ดูโปรเจกต์ถัดไป: [weather-app](https://github.com/JirawatDonbantao/weather-app) — Full-Stack Weather Application ที่เชื่อมต่อกับ API นี้
 
 ---
 
