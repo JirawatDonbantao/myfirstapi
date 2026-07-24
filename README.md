@@ -1,3 +1,4 @@
+![Run Tests](https://github.com/JirawatDonbantao/myfirstapi/actions/workflows/test.yml/badge.svg)
 # 🚀 MyFirstAPI
 
 โปรเจกต์ API แรกของฉัน สร้างด้วย Node.js และ Express พร้อม Deploy ขึ้น Cloud จริงบน **Render** เชื่อมต่อฐานข้อมูล **Neon PostgreSQL** มีระบบ **สมัครสมาชิก/เข้าสู่ระบบ** ด้วย JWT
